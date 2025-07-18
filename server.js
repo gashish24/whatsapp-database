@@ -1,7 +1,7 @@
 // server.js - Main server file for WhatsApp Business API Database
 
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
@@ -14,7 +14,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Initialize SQLite database
-const db = new sqlite3.Database('./whatsapp_data.db', (err) => {
+const db = new Database('./whatsapp_data.db');
+console.log('Connected to SQLite database');
+createTables();
     if (err) {
         console.error('Error opening database:', err);
     } else {
@@ -27,7 +29,7 @@ const db = new sqlite3.Database('./whatsapp_data.db', (err) => {
 // Create database tables
 function createTables() {
     // Table for storing WhatsApp messages
-    db.run(`
+    db.exec(`
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             phone_number TEXT NOT NULL,
@@ -39,7 +41,7 @@ function createTables() {
     `);
 
     // Table for storing user data
-    db.run(`
+    db.exec(`
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             phone_number TEXT UNIQUE NOT NULL,
@@ -52,6 +54,7 @@ function createTables() {
 
     console.log('Database tables created successfully');
 }
+  
 
 // API Routes
 
